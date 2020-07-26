@@ -1,0 +1,21 @@
+.collapsing {
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    -webkit-transition: all 0.2s; /* Safari */
+    transition: all 0.2s;
+}
+
+.table-container1 {
+    width: 90%;
+    min-width: 500px;
+    margin-right: 50px;
+    margin-left: 10;
+    float: left;
+}
+
+.table-container2 {
+    width: 90%;
+    min-width: 500px;
+    float: left;
+}

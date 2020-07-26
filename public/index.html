@@ -1,0 +1,320 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dataviewer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="w-100 float-left">
+        <form id="upload-metrics" method="post" action="http://localhost:8080/upload" enctype="multipart/form-data">
+            <input type="file" name="metricsFile" />
+            <input type="submit" value="Upload" />
+        </form>
+    </div>
+    <div class="w-100 float-left">
+        <button class="btn btn-primary" id="filt-1" onclick="showHideCol(event)">File</button>
+        <button class="btn btn-primary" id="filt-2" onclick="showHideCol(event)">Goodput (Kbps)</button>
+        <button class="btn btn-primary" id="filt-3" onclick="showHideCol(event)">Throughput (Kbps)</button>
+        <button class="btn btn-primary" id="filt-4" onclick="showHideCol(event)">RTT (ms)</button>
+        <button class="btn btn-primary" id="filt-5" onclick="showHideCol(event)">CWND</button>
+        <button class="btn btn-primary" id="filt-6" onclick="showHideCol(event)">RTT Var</button>
+        <button class="btn btn-primary" id="filt-7" onclick="showHideCol(event)">Retrans</button>
+        <button class="btn btn-primary" id="filt-8" onclick="showHideCol(event)">Spurious retrans</button>
+        <button class="btn btn-primary" id="filt-9" onclick="showHideCol(event)">Time threshold</button>
+        <button class="btn btn-primary" id="filt-10" onclick="showHideCol(event)">PTO</button>
+        <button class="btn btn-primary" id="filt-11" onclick="showHideCol(event)">RTO</button>
+        <button class="btn btn-primary" id="filt-12" onclick="showHideCol(event)">pkt_trsh_trigger</button>
+        <button class="btn btn-primary" id="filt-13" onclick="showHideCol(event)">time_trsh_trigger</button>
+        <button class="btn btn-primary" id="filt-14" onclick="showHideCol(event)">PTO_trigger</button>
+        <button class="btn btn-primary" id="filt-15" onclick="showHideCol(event)">RTO_trigger</button>
+    </div>
+    <div class="w-100 float-left">
+        <button class="btn btn-primary" id="filt-1" onclick="showAllRows(event)">Show all rows</button>
+    </div>
+    <div id="qns-data-container" class="table-container1">
+        <h3 class="w-100 text-center">Quic-Network-Simulator</h3>
+        <table class="table">
+            <thead class="thead-light">
+                <tr id="qns-head">
+                    <th></th>
+                    <th>File</th>
+                    <th>Goodput (Kbps)</th>
+                    <th>Throughput (Kbps)</th>
+                    <th>RTT (ms)</th>
+                    <th>CWND</th>
+                    <th>RTT Var</th>
+                    <th>Retrans</th>
+                    <th>Spurious retrans</th>
+                    <th>Time threshold</th>
+                    <th>PTO</th>
+                    <th>RTO</th>
+                    <th>pkt_trsh_trigger</th>
+                    <th>time_trsh_trigger</th>
+                    <th>PTO_trigger</th>
+                    <th>RTO_trigger</th>
+                    <th>Hide</th>
+                </tr>
+            </thead>
+
+            <tbody id="qns-body">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="min-data-container" class="table-container2">
+        <h3 class="w-100 text-center">Mininet</h3>
+        <table class="table">
+            <thead class="thead-light">
+                <tr id="min-head">
+                    <th></th>
+                    <th>File</th>
+                    <th>Goodput (Kbps)</th>
+                    <th>Throughput (Kbps)</th>
+                    <th>RTT (ms)</th>
+                    <th>CWND</th>
+                    <th>RTT Var</th>
+                    <th>Retrans</th>
+                    <th>Spurious retrans</th>
+                    <th>Time threshold</th>
+                    <th>PTO</th>
+                    <th>RTO</th>
+                    <th>pkt_trsh_trigger</th>
+                    <th>time_trsh_trigger</th>
+                    <th>PTO_trigger</th>
+                    <th>RTO_trigger</th>
+                    <th>Hide</th>
+                </tr>
+            </thead>
+
+            <tbody id="min-body">
+            </tbody>
+        </table>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script>
+let colors = [
+    "#c39797",
+    "#b3a394",
+    "#fa8072",
+    "#fed88f",
+    "#d0e2ec",
+    "#bfe2ca",
+    "#6ca1c9"
+]
+async function addTableRows() {
+    let response = await fetch('http://localhost:8080/metrics.json')
+    let metrics = await response.json()
+    
+    await addRowsToTable(metrics, "qns")
+    await addRowsToTable(metrics, "min")
+}
+
+async function addRowsToTable(metrics, sim){
+    let tbody = document.getElementById(sim + "-body")
+    let testid = 0
+    metrics.forEach(element => {
+        if (element.sim.toLowerCase() === sim) {
+            let row = document.createElement("tr")
+            row.setAttribute("bgcolor", colors[testid])
+            row.id = element.name.replace("/", "+") + "+" + sim
+            let td = document.createElement("td")
+            let expnd = document.createElement('div')
+            expnd.innerHTML = ">"
+            expnd.setAttribute("data-toggle", "collapse")
+            expnd.setAttribute("data-target", "." + element.name.replace("/", "-") + "-" + sim) 
+            td.append(expnd)
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = element.name
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_goodput + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_throughput + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_rtt + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_cwnd + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_rttvar + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_retransmissions + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_spurious_retrans + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_rack_timer + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_probe_timer + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = Math.round((element.mdn_retrans_timer + Number.EPSILON) * 100) / 100
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = "X"
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = "X"
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = "X"
+            row.append(td)
+            td = document.createElement("td")
+            td.innerHTML = "X"
+            row.append(td)
+            td = document.createElement("td")
+            hidebtn = document.createElement("button")
+            hidebtn.className = "btn btn-warning"
+            hidebtn.onclick = function(event) { 
+                hideRow(event)
+            };
+            td.append(hidebtn)
+            row.append(td)
+            tbody.append(row)
+
+            element.runs.forEach((run, id) => {
+                let row = document.createElement("tr")
+                row.className = element.name.replace("/", "-") + "-" + sim + " collapse"
+                row.setAttribute("bgcolor", colors[testid])
+                let td = document.createElement("td")
+                td.append(document.createElement('div').innerHTML = "-") 
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = "run" + (id + 1)
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_goodput + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_throughput + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_rtt + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_cwnd + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_rttvar + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.retransmissions + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.spurious_retrans + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_rack_timer + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_probe_timer + Number.EPSILON) * 100) / 100
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = Math.round((run.avg_retrans_timer + Number.EPSILON) * 100) / 100
+                row.append(td)
+
+                let value = "X"
+                if ("packet_threshold" in run.loss_triggers)
+                    value = run.loss_triggers.packet_threshold
+                td = document.createElement("td")
+                td.innerHTML = value
+                row.append(td)
+                value = "X"
+                if ("time_threshold" in run.loss_triggers)
+                    value = run.loss_triggers.time_threshold
+                td = document.createElement("td")
+                td.innerHTML = value
+                row.append(td)
+                value = "X"
+                if ("pto_expired" in run.loss_triggers)
+                    value = run.loss_triggers.pto_expired
+                td = document.createElement("td")
+                td.innerHTML = value
+                row.append(td)
+                value = "X"
+                if ("retrans_timer" in run.loss_triggers)
+                    value = run.loss_triggers.retrans_timer
+                td = document.createElement("td")
+                td.innerHTML = value
+                row.append(td)
+                td = document.createElement("td")
+                td.innerHTML = "-"
+                row.append(td)
+                tbody.append(row)
+            })
+            testid++
+            if (testid == colors.length)
+                testid = 0
+        }
+    });
+}
+
+function hideRow(e) {
+    let row_id = e.srcElement.parentElement.parentElement.id;
+    row_id = row_id.replace(/\+/g, "-")
+    let rowchilds = document.getElementsByClassName(row_id)
+    console.log(row_id)
+    e.srcElement.parentElement.parentElement.hidden = true
+    for (let i = 0; i < rowchilds.length; i++) {
+        rowchilds[i].hidden = true        
+    }
+}
+
+function showAllRows(e) {
+    let tbody = document.getElementById("qns-body")
+    let all_rows = tbody.children
+    for (let i = 0; i < all_rows.length; i++) {
+        all_rows.item(i).hidden = false
+    }
+
+    tbody = document.getElementById("min-body")
+    all_rows = tbody.children
+    for (let i = 0; i < all_rows.length; i++) {
+        all_rows.item(i).hidden = false
+    }
+}
+
+function showHideCol(e) {
+    let btn_id = e.srcElement.id;
+    let index = parseInt(btn_id.split("-")[1])
+    
+    let qnshead = document.getElementById("qns-head")
+    let qnsrows = document.getElementById("qns-body").children
+
+    let minhead = document.getElementById("min-head")
+    let minrows = document.getElementById("min-body").children
+
+    qnshead.children.item(index).hidden = !qnshead.children.item(index).hidden;
+    minhead.children.item(index).hidden = !minhead.children.item(index).hidden;
+
+    
+    for (let i = 0; i < qnsrows.length; i++) {
+        let row = qnsrows.item(i)
+        row.children.item(index).hidden = !row.children.item(index).hidden
+        row = minrows.item(i)
+        row.children.item(index).hidden = !row.children.item(index).hidden
+    }
+    
+    let btnclass = e.srcElement.className
+    if (btnclass.includes("outline"))
+        e.srcElement.className = "btn btn-primary"
+    else
+        e.srcElement.className = "btn btn-outline-primary"
+}
+addTableRows()
+
+
+</script>
+</html>
