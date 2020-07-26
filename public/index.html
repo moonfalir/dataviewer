@@ -40,20 +40,20 @@
                 <tr id="qns-head">
                     <th></th>
                     <th>File</th>
-                    <th>Goodput (Kbps)</th>
-                    <th>Throughput (Kbps)</th>
-                    <th>RTT (ms)</th>
-                    <th>CWND</th>
-                    <th>RTT Var</th>
-                    <th>Retrans</th>
-                    <th>Spurious retrans</th>
-                    <th>Time threshold</th>
-                    <th>PTO</th>
-                    <th>RTO</th>
-                    <th>pkt_trsh_trigger</th>
-                    <th>time_trsh_trigger</th>
-                    <th>PTO_trigger</th>
-                    <th>RTO_trigger</th>
+                    <th id="qns-2" onclick="columnMedian(event)">Goodput (Kbps)</th>
+                    <th id="qns-3" onclick="columnMedian(event)">Throughput (Kbps)</th>
+                    <th id="qns-4" onclick="columnMedian(event)">RTT (ms)</th>
+                    <th id="qns-5" onclick="columnMedian(event)">CWND</th>
+                    <th id="qns-6" onclick="columnMedian(event)">RTT Var</th>
+                    <th id="qns-7" onclick="columnMedian(event)">Retrans</th>
+                    <th id="qns-8" onclick="columnMedian(event)">Spurious retrans</th>
+                    <th id="qns-9" onclick="columnMedian(event)">Time threshold</th>
+                    <th id="qns-10" onclick="columnMedian(event)">PTO</th>
+                    <th id="qns-11" onclick="columnMedian(event)">RTO</th>
+                    <th id="qns-12" onclick="columnMedian(event)">pkt_trsh_trigger</th>
+                    <th id="qns-13" onclick="columnMedian(event)">time_trsh_trigger</th>
+                    <th id="qns-14" onclick="columnMedian(event)">PTO_trigger</th>
+                    <th id="qns-15" onclick="columnMedian(event)">RTO_trigger</th>
                     <th>Hide</th>
                 </tr>
             </thead>
@@ -70,20 +70,20 @@
                 <tr id="min-head">
                     <th></th>
                     <th>File</th>
-                    <th>Goodput (Kbps)</th>
-                    <th>Throughput (Kbps)</th>
-                    <th>RTT (ms)</th>
-                    <th>CWND</th>
-                    <th>RTT Var</th>
-                    <th>Retrans</th>
-                    <th>Spurious retrans</th>
-                    <th>Time threshold</th>
-                    <th>PTO</th>
-                    <th>RTO</th>
-                    <th>pkt_trsh_trigger</th>
-                    <th>time_trsh_trigger</th>
-                    <th>PTO_trigger</th>
-                    <th>RTO_trigger</th>
+                    <th id="min-2" onclick="columnMedian(event)">Goodput (Kbps)</th>
+                    <th id="min-3" onclick="columnMedian(event)">Throughput (Kbps)</th>
+                    <th id="min-4" onclick="columnMedian(event)">RTT (ms)</th>
+                    <th id="min-5" onclick="columnMedian(event)">CWND</th>
+                    <th id="min-6" onclick="columnMedian(event)">RTT Var</th>
+                    <th id="min-7" onclick="columnMedian(event)">Retrans</th>
+                    <th id="min-8" onclick="columnMedian(event)">Spurious retrans</th>
+                    <th id="min-9" onclick="columnMedian(event)">Time threshold</th>
+                    <th id="min-10" onclick="columnMedian(event)">PTO</th>
+                    <th id="min-11" onclick="columnMedian(event)">RTO</th>
+                    <th id="min-12" onclick="columnMedian(event)">pkt_trsh_trigger</th>
+                    <th id="min-13" onclick="columnMedian(event)">time_trsh_trigger</th>
+                    <th id="min-14" onclick="columnMedian(event)">PTO_trigger</th>
+                    <th id="min-15" onclick="columnMedian(event)">RTO_trigger</th>
                     <th>Hide</th>
                 </tr>
             </thead>
@@ -112,6 +112,8 @@ async function addTableRows() {
     
     await addRowsToTable(metrics, "qns")
     await addRowsToTable(metrics, "min")
+    getMedianForColumn(2, "qns")
+    getMedianForColumn(2, "min")
 }
 
 async function addRowsToTable(metrics, sim){
@@ -121,58 +123,58 @@ async function addRowsToTable(metrics, sim){
         if (element.sim.toLowerCase() === sim) {
             let row = document.createElement("tr")
             row.setAttribute("bgcolor", colors[testid])
-            row.id = element.name.replace("/", "+") + "+" + sim
+            row.id = element.name.replace("/", "_") + "_" + sim
             let td = document.createElement("td")
             let expnd = document.createElement('div')
             expnd.innerHTML = ">"
             expnd.setAttribute("data-toggle", "collapse")
-            expnd.setAttribute("data-target", "." + element.name.replace("/", "-") + "-" + sim) 
+            expnd.setAttribute("data-target", "." + element.name.replace(/[\/|_]/g, "-") + "-" + sim) 
             td.append(expnd)
             row.append(td)
             td = document.createElement("td")
             td.innerHTML = element.name
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_goodput + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_throughput + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_rtt + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_cwnd + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_rttvar + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_retransmissions + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_spurious_retrans + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_rack_timer + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_probe_timer + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = Math.round((element.mdn_retrans_timer + Number.EPSILON) * 100) / 100
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = "X"
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = "X"
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = "X"
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
-            td.innerHTML = "X"
+            td.innerHTML = "x"
             row.append(td)
             td = document.createElement("td")
             hidebtn = document.createElement("button")
@@ -186,7 +188,7 @@ async function addRowsToTable(metrics, sim){
 
             element.runs.forEach((run, id) => {
                 let row = document.createElement("tr")
-                row.className = element.name.replace("/", "-") + "-" + sim + " collapse"
+                row.className = element.name.replace(/[\/|_]/g, "-") + "-" + sim + " collapse"
                 row.setAttribute("bgcolor", colors[testid])
                 let td = document.createElement("td")
                 td.append(document.createElement('div').innerHTML = "-") 
@@ -225,25 +227,25 @@ async function addRowsToTable(metrics, sim){
                 td.innerHTML = Math.round((run.avg_retrans_timer + Number.EPSILON) * 100) / 100
                 row.append(td)
 
-                let value = "X"
+                let value = "0"
                 if ("packet_threshold" in run.loss_triggers)
                     value = run.loss_triggers.packet_threshold
                 td = document.createElement("td")
                 td.innerHTML = value
                 row.append(td)
-                value = "X"
+                value = "0"
                 if ("time_threshold" in run.loss_triggers)
                     value = run.loss_triggers.time_threshold
                 td = document.createElement("td")
                 td.innerHTML = value
                 row.append(td)
-                value = "X"
+                value = "0"
                 if ("pto_expired" in run.loss_triggers)
                     value = run.loss_triggers.pto_expired
                 td = document.createElement("td")
                 td.innerHTML = value
                 row.append(td)
-                value = "X"
+                value = "0"
                 if ("retrans_timer" in run.loss_triggers)
                     value = run.loss_triggers.retrans_timer
                 td = document.createElement("td")
@@ -263,7 +265,7 @@ async function addRowsToTable(metrics, sim){
 
 function hideRow(e) {
     let row_id = e.srcElement.parentElement.parentElement.id;
-    row_id = row_id.replace(/\+/g, "-")
+    row_id = row_id.replace(/_/g, "-")
     let rowchilds = document.getElementsByClassName(row_id)
     console.log(row_id)
     e.srcElement.parentElement.parentElement.hidden = true
@@ -312,6 +314,40 @@ function showHideCol(e) {
         e.srcElement.className = "btn btn-primary"
     else
         e.srcElement.className = "btn btn-outline-primary"
+}
+
+function getMedianForColumn(columnid, sim) {
+    let table = document.getElementById(sim + "-body")
+    let parentrows = table.querySelectorAll('[id$=_' + sim + ']')
+
+    parentrows.forEach((par_el) => {
+        let cl_name = par_el.id.replace(/_/g, "-")
+        let childrows = table.querySelectorAll('[class*=' + cl_name + ']')
+        
+        let col_values = []
+        childrows.forEach((child_el, c_id) => {
+            let c_col = child_el.children[columnid]
+            col_values.push({
+                "val": parseFloat(c_col.innerHTML),
+                "index": c_id
+            })
+        })
+        col_values.sort((a, b) => a.val - b.val);
+        let med_index = col_values[Math.floor(col_values.length/2)].index;
+        let med_row = childrows.item(med_index);
+        for (let i = 2; i < par_el.children.length - 1; i++) {
+            par_el.children.item(i).innerHTML = med_row.children.item(i).innerHTML            
+        }
+    })
+}
+
+function columnMedian(e) {
+    let col_id = e.srcElement.id;
+    col_id = col_id.split("-")
+    let sim = col_id[0]
+    let col = parseInt(col_id[1])
+
+    getMedianForColumn(col, sim)
 }
 addTableRows()
 
