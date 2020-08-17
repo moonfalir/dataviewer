@@ -49,6 +49,6 @@ fig = plt.figure()
 # Create an axes instance
 ax = fig.add_subplot(111)
 # Create the boxplot
-bp = ax.boxplot(rttvars, showfliers=False)
-print(numpy.mean(rtts), numpy.var(rtts))
+bp = ax.boxplot(rtts)
+#print(numpy.mean(rtts), numpy.var(rtts))
 plt.show()
